@@ -6,6 +6,8 @@ import { MasterDataController } from './master-data.controller';
 import { MasterDataService } from './master-data.service';
 import { ClinicalTestsController, MedicalRecordsController } from './medical-records.controller';
 import { MedicalRecordsService } from './medical-records.service';
+import { NotificationsController } from './notifications.controller';
+import { NotificationsService } from './notifications.service';
 import { PrescriptionsController } from './prescriptions.controller';
 import { PrescriptionsService } from './prescriptions.service';
 import { TelemedicineSchemas } from '../database/schemas/telemedicine.schemas';
@@ -15,6 +17,7 @@ import { TelemedicineSchemas } from '../database/schemas/telemedicine.schemas';
   controllers: [
     MasterDataController,
     AppointmentController,
+    NotificationsController,
     MedicalRecordsController,
     ClinicalTestsController,
     PrescriptionsController,
@@ -22,6 +25,7 @@ import { TelemedicineSchemas } from '../database/schemas/telemedicine.schemas';
   providers: [
     MasterDataService,
     AppointmentService,
+    NotificationsService,
     MedicalRecordsService,
     PrescriptionsService,
   ],

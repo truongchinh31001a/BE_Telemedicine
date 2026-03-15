@@ -2,6 +2,7 @@ import { BadRequestException, Injectable, NotFoundException } from '@nestjs/comm
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { idText, pickAlias, requireObjectId, toIsoDate } from './common/alias.util';
+import { NotificationsService } from './notifications.service';
 
 @Injectable()
 export class AppointmentService {
@@ -12,6 +13,7 @@ export class AppointmentService {
     @InjectModel('UserProfile') private readonly userProfileModel: Model<any>,
     @InjectModel('Schedule') private readonly scheduleModel: Model<any>,
     @InjectModel('Department') private readonly departmentModel: Model<any>,
+    private readonly notificationsService: NotificationsService,
   ) {}
 
   async getMyAppointments(query: Record<string, unknown>) {
@@ -71,8 +73,45 @@ export class AppointmentService {
       requireObjectId(appointmentId, 'appointmentId'),
     );
     if (!appointment) throw new NotFoundException('Appointment not found');
+
+    const [staff, patient] = await Promise.all([
+      this.staffModel.findById(appointment.staff_id).lean(),
+      this.patientModel.findById(appointment.patient_id).lean(),
+    ]);
+
     appointment.status = 'canceled';
     await appointment.save();
+
+    if (patient?.user_id) {
+      await this.notificationsService.create({
+        userId: String(patient.user_id),
+        title: 'Lich kham da bi huy',
+        message: `Lich kham ngay ${appointment.work_date?.toISOString?.().slice(0, 10) ?? ''} luc ${appointment.start_time} da duoc huy.`,
+        type: 'appointment',
+        refType: 'Appointment',
+        refId: String(appointment._id),
+        metadata: {
+          appointmentId: String(appointment._id),
+          status: 'canceled',
+        },
+      });
+    }
+
+    if (staff?.user_id) {
+      await this.notificationsService.create({
+        userId: String(staff.user_id),
+        title: 'Lich kham da bi huy',
+        message: `Cuoc hen ngay ${appointment.work_date?.toISOString?.().slice(0, 10) ?? ''} luc ${appointment.start_time} da bi huy.`,
+        type: 'appointment',
+        refType: 'Appointment',
+        refId: String(appointment._id),
+        metadata: {
+          appointmentId: String(appointment._id),
+          status: 'canceled',
+        },
+      });
+    }
+
     return { success: true, message: 'Appointment canceled' };
   }
 

@@ -304,6 +304,24 @@ export const PrescriptionDetailSchema = new Schema(
   { versionKey: false },
 );
 
+export const NotificationSchema = new Schema(
+  {
+    user_id: { type: objectId, ref: 'User', required: true, index: true },
+    title: { type: String, required: true, trim: true },
+    message: { type: String, required: true, trim: true },
+    type: { type: String, trim: true, default: 'system' },
+    ref_type: { type: String, trim: true },
+    ref_id: { type: objectId },
+    is_read: { type: Boolean, default: false, index: true },
+    read_at: { type: Date, default: null },
+    metadata: { type: Schema.Types.Mixed },
+  },
+  {
+    timestamps: { createdAt: 'created_at', updatedAt: false },
+    versionKey: false,
+  },
+);
+
 export const TelemedicineSchemas = [
   { name: 'User', schema: UserSchema },
   { name: 'UserProfile', schema: UserProfileSchema },
@@ -326,4 +344,5 @@ export const TelemedicineSchemas = [
   { name: 'Drug', schema: DrugSchema },
   { name: 'Prescription', schema: PrescriptionSchema },
   { name: 'PrescriptionDetail', schema: PrescriptionDetailSchema },
+  { name: 'Notification', schema: NotificationSchema },
 ];

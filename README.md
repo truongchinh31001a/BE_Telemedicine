@@ -55,6 +55,7 @@ $ npm run start:prod
 - Protected endpoints: require `Authorization: Bearer <accessToken>`
 - Env: `JWT_SECRET=your-secret`
 - CORS origin: `FRONTEND_ORIGIN=http://localhost:3000` (nhiều origin thì ngăn cách bằng dấu phẩy)
+- Optional preview domains: `FRONTEND_ORIGIN_SUFFIXES=.vercel.app` (nhiều suffix thì ngăn cách bằng dấu phẩy)
 
 ## Seed data (MongoDB)
 

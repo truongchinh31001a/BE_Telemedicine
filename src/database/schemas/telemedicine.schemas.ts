@@ -71,6 +71,35 @@ export const AuthSessionSchema = new Schema(
 export const DepartmentSchema = new Schema(
   {
     department_name: { type: String, required: true, unique: true, trim: true },
+    department_code: { type: String, trim: true, unique: true, sparse: true },
+    room: { type: String, trim: true },
+    type: { type: String, trim: true },
+    phone: { type: String, trim: true },
+    email: { type: String, trim: true, lowercase: true },
+    status: { type: String, trim: true },
+    avatar: { type: String, trim: true },
+    description: { type: String, trim: true },
+    services: { type: String, trim: true },
+    functions: { type: String, trim: true },
+    other_info: { type: String, trim: true },
+    attachments: [
+      new Schema(
+        {
+          name: { type: String, trim: true },
+          url: { type: String, trim: true },
+        },
+        { _id: false, versionKey: false },
+      ),
+    ],
+    related_departments: [
+      new Schema(
+        {
+          code: { type: String, trim: true },
+          name: { type: String, trim: true },
+        },
+        { _id: false, versionKey: false },
+      ),
+    ],
   },
   { versionKey: false },
 );
@@ -79,7 +108,33 @@ export const StaffSchema = new Schema(
   {
     user_id: { type: objectId, ref: 'User', required: true, unique: true },
     department_id: { type: objectId, ref: 'Department', required: true },
+    staff_code: { type: String, trim: true, unique: true, sparse: true },
     position: { type: String, trim: true },
+  },
+  { versionKey: false },
+);
+
+export const DoctorSchema = new Schema(
+  {
+    staff_id: { type: objectId, ref: 'Staff', required: true, unique: true },
+    doctor_code: { type: String, required: true, trim: true, unique: true },
+    specialty: { type: String, trim: true },
+    social_insurance: { type: String, trim: true },
+    professional_role: { type: String, trim: true },
+    title: { type: String, trim: true },
+    introduction: { type: String, trim: true },
+    treatment_scope: { type: String, trim: true },
+    work_history: { type: String, trim: true },
+    achievements: { type: String, trim: true },
+    attachments: [
+      new Schema(
+        {
+          name: { type: String, trim: true },
+          url: { type: String, trim: true },
+        },
+        { _id: false, versionKey: false },
+      ),
+    ],
   },
   { versionKey: false },
 );
@@ -257,6 +312,7 @@ export const TelemedicineSchemas = [
   { name: 'AuthSession', schema: AuthSessionSchema },
   { name: 'Department', schema: DepartmentSchema },
   { name: 'Staff', schema: StaffSchema },
+  { name: 'Doctor', schema: DoctorSchema },
   { name: 'Patient', schema: PatientSchema },
   { name: 'Appointment', schema: AppointmentSchema },
   { name: 'AppointmentMember', schema: AppointmentMemberSchema },

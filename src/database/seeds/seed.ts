@@ -27,6 +27,7 @@ async function runSeed() {
   const UserRole = models.get('UserRole')!;
   const Department = models.get('Department')!;
   const Staff = models.get('Staff')!;
+  const Doctor = models.get('Doctor')!;
   const Patient = models.get('Patient')!;
   const Appointment = models.get('Appointment')!;
   const MedicalRecord = models.get('MedicalRecord')!;
@@ -61,15 +62,53 @@ async function runSeed() {
   const [internalDept, cardioDept] = await Promise.all([
     Department.findOneAndUpdate(
       { department_name: 'Noi tong quat' },
-      { $set: { department_name: 'Noi tong quat' } },
+      {
+        $set: {
+          department_name: 'Noi tong quat',
+          department_code: 'KN001',
+          room: 'P101',
+          type: 'Lam sang',
+          phone: '02812345678',
+          email: 'khoanoi@hospital.vn',
+          status: 'Hoat dong',
+          avatar: '/images/departments/khoanoi.png',
+          description: 'Khoa Noi tiep nhan va dieu tri cac benh ly noi khoa tong quat.',
+          services: 'Kham noi tong quat, tu van dieu tri, theo doi benh man tinh.',
+          functions: 'Tham kham, chan doan, dieu tri noi khoa va quan ly benh an.',
+          other_info: 'Ho tro dat lich kham truc tuyen va tai kham dinh ky.',
+          attachments: [{ name: 'Tong quan khoa noi.pdf', url: '/files/departments/khoanoi-overview.pdf' }],
+          related_departments: [{ code: 'KH001', name: 'Khoa Hoi suc' }],
+        },
+        $unset: { members: '' },
+      },
       { upsert: true, returnDocument: 'after' },
     ),
     Department.findOneAndUpdate(
       { department_name: 'Tim mach' },
-      { $set: { department_name: 'Tim mach' } },
+      {
+        $set: {
+          department_name: 'Tim mach',
+          department_code: 'TM001',
+          room: 'P201',
+          type: 'Chuyen khoa',
+          phone: '02898765432',
+          email: 'timmach@hospital.vn',
+          status: 'Hoat dong',
+          avatar: '/images/departments/timmach.png',
+          description: 'Khoa Tim mach chuyen kham va dieu tri cac benh ly tim mach.',
+          services: 'Dien tim, sieu am tim, theo doi va dieu tri benh tim mach.',
+          functions: 'Chan doan va dieu tri benh tim mach, cap cuu tim mach.',
+          other_info: 'Co lich kham uu tien cho benh nhan tai kham.',
+          attachments: [{ name: 'Dich vu khoa tim mach.pdf', url: '/files/departments/timmach-services.pdf' }],
+          related_departments: [{ code: 'KN001', name: 'Khoa Noi' }],
+        },
+        $unset: { members: '' },
+      },
       { upsert: true, returnDocument: 'after' },
     ),
   ]);
+
+  await Department.collection.updateMany({}, { $unset: { members: '' } });
 
   const adminUser = await User.findOneAndUpdate(
     { username: 'admin' },
@@ -129,12 +168,15 @@ async function runSeed() {
       { user_id: doctorUser._id },
       {
         $set: {
-          full_name: 'Dr. Nguyen Van A',
-          gender: 'male',
-          phone: '0900000002',
-          address: 'Ho Chi Minh City',
+          full_name: 'TS.BS Nguyen Van A',
+          date_of_birth: new Date('1975-06-20'),
+          gender: 'Nam',
+          phone: '0912345678',
+          address: '123 Le Loi, Q1, TP.HCM',
           nationality: 'Viet Nam',
-          cccd: '079201001111',
+          ethnicity: 'Kinh',
+          image_url: '/avatars/a.jpg',
+          cccd: '012345678901',
           cccd_issue_place: 'TP.HCM',
         },
         $setOnInsert: { user_id: doctorUser._id },
@@ -187,9 +229,33 @@ async function runSeed() {
     {
       $set: {
         department_id: internalDept._id,
-        position: 'Bac si noi tong quat',
+        staff_code: 'NV001',
+        position: 'Truong khoa',
       },
       $setOnInsert: { user_id: doctorUser._id },
+    },
+    { upsert: true, returnDocument: 'after' },
+  );
+
+  await Doctor.findOneAndUpdate(
+    { staff_id: doctorStaff._id },
+    {
+      $set: {
+        doctor_code: 'BS001',
+        specialty: 'Tim mach',
+        social_insurance: '123456789',
+        professional_role: 'Bac si dieu tri',
+        title: 'Truong khoa',
+        introduction: 'Bac si co nhieu nam kinh nghiem trong kham va dieu tri benh tim mach.',
+        treatment_scope: 'Kham tim mach, theo doi benh tang huyet ap, tu van va dieu tri noi khoa.',
+        work_history: 'Cong tac tai benh vien tuyen trung uong va phu trach khoa noi tong quat.',
+        achievements: 'Hoan thanh nhieu de tai chuyen mon va tham gia dao tao bac si tre.',
+        attachments: [
+          { name: 'So yeu ly lich.pdf', url: '/files/profile.pdf' },
+          { name: 'Bang chuyen khoa II.jpg', url: '/files/bangck2.jpg' },
+        ],
+      },
+      $setOnInsert: { staff_id: doctorStaff._id },
     },
     { upsert: true, returnDocument: 'after' },
   );
